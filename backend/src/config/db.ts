@@ -13,7 +13,9 @@ const connectDB = async () => {
             autoIndex: true,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
-            family: 4
+            family: 4,
+            useNewUrlParser: true,
+            useUnifiedTopology: true
         } as any);
         console.log('MongoDB connected successfully');
     } catch (error: any) {
