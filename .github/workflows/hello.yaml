@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
   push:
     branches:
-      -main
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      -name: checkout repo
-      uses: actions/checkout@v2
+      - name: checkout repo
+        uses: actions/checkout@v2
 
-      -name: say hello
-      run: echo "hello world"
-      shell: bash
+      - name: say hello
+        run: echo "hello world"
+        shell: bash
