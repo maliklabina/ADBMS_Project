@@ -9,22 +9,27 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
 
   const publicLinks = [
     { name: 'Home', path: '/' },
     { name: 'Book Room', path: '/booking' },
     { name: 'Check-in/Check-out', path: '/check-status' },
-    { name: 'Sign In', path: '/auth' },
   ];
 
-  const privateLinks = [
-    { name: 'Guests', path: '/guests' },
+  const adminLinks = [
+    { name: 'All Bookings', path: '/guests' },
   ];
+
+  const userLinks = [
+    { name: 'My Bookings', path: '/bookings' },
+  ];
+
+  const privateLinks = isAdmin ? adminLinks : userLinks;
 
   const navLinks = [
     ...publicLinks,
-    ...(isAuthenticated ? privateLinks : [{ name: 'Login', path: '/login' }]),
+    ...(isAuthenticated ? privateLinks : [{ name: 'Sign In', path: '/login' }]),
   ];
 
   const handleLogout = () => {

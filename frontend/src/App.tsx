@@ -14,7 +14,7 @@ import GuestsList from "./pages/GuestsList";
 import CheckStatus from "./pages/CheckStatus";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import UserAuth from "./pages/UserAuth";
+import { Debug } from "./components/Debug";
 
 const queryClient = new QueryClient();
 
@@ -28,17 +28,22 @@ const App = () => (
           <BrowserRouter>
             <div className="flex flex-col min-h-screen">
               <Navbar />
+              <Debug />
               <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/auth" element={<UserAuth />} />
                   <Route path="/booking" element={<BookingForm />} />
                   <Route path="/check-status" element={<CheckStatus />} />
                   <Route path="/login" element={<Login />} />
                   
-                  {/* Protected Routes */}
+                  {/* Protected Admin Routes */}
                   <Route path="/guests" element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requireAdmin>
+                      <GuestsList />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/bookings" element={
+                    <ProtectedRoute requireAdmin>
                       <GuestsList />
                     </ProtectedRoute>
                   } />

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBookings, Booking } from '@/contexts/BookingContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -26,11 +25,11 @@ import {
 import EditBookingModal from '@/components/modals/EditBookingModal';
 
 const GuestsList = () => {
-  const navigate = useNavigate();
   const { bookings, loading, error, fetchBookings, updateBookingStatus, cancelBooking } = useBookings();
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editBooking, setEditBooking] = useState<Booking | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     console.log('GuestsList: Component mounted');
@@ -40,13 +39,12 @@ const GuestsList = () => {
     
     if (!token || !isAdmin) {
       console.log('GuestsList: No token or not admin, redirecting...');
-      navigate('/login');
       return;
     }
 
     console.log('GuestsList: Fetching bookings...');
     fetchBookings();
-  }, [fetchBookings, navigate]);
+  }, [fetchBookings]);
 
   const filteredBookings = bookings.filter((booking) =>
     booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -90,7 +88,64 @@ const GuestsList = () => {
     );
   };
 
-  if (loading) {
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <Card className="p-12 text-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <p className="text-muted-foreground text-lg">Loading bookings...</p>
+          </div>
+        </Card>
+      );
+    }
+
+    if (error) {
+      return (
+        <Card className="p-12 text-center">
+          <p className="text-destructive text-lg">Error: {error}</p>
+          <Button onClick={fetchBookings} className="mt-4">Retry</Button>
+        </Card>
+      );
+    }
+
+    if (!loading && bookings.length === 0) {
+      return (
+        <Card className="p-12 text-center">
+          <p className="text-muted-foreground text-lg">No bookings found</p>
+        </Card>
+      );
+    }
+
+    // Show loading state
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-secondary/30">
+          <Card className="p-12">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              <p className="text-muted-foreground text-lg">Loading bookings...</p>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
+    // Show error state
+    if (error) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-secondary/30">
+          <Card className="p-12 text-center">
+            <p className="text-destructive text-lg">Error loading bookings: {error}</p>
+            <Button onClick={fetchBookings} className="mt-4">Retry</Button>
+          </Card>
+        </div>
+      );
+    }
+
+    // Show main content
+    return (
+      if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary/30">
         <Card className="p-12">
@@ -136,12 +191,8 @@ const GuestsList = () => {
         </Card>
 
         {/* Bookings Table */}
-        {filteredBookings.length === 0 ? (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground text-lg">No bookings found</p>
-          </Card>
-        ) : (
-          <Card className="overflow-hidden shadow-elegant">
+        {renderContent()}
+          <Card className="overflow-hidden shadow-elegant animate-scale-in">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gradient-primary text-primary-foreground">
@@ -157,10 +208,11 @@ const GuestsList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {filteredBookings.map((booking) => (
+                  {filteredBookings.map((booking, index) => (
                     <tr
                       key={booking._id}
-                      className="hover:bg-secondary/50 transition-colors"
+                      className="hover:bg-secondary/50 transition-colors animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <td className="px-6 py-4 text-sm font-medium">{booking._id}</td>
                       <td className="px-6 py-4 text-sm">{booking.guestName}</td>

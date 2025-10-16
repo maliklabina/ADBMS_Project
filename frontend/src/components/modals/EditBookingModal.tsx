@@ -56,13 +56,14 @@ const EditBookingModal = ({ booking, isOpen, onClose }: EditBookingModalProps) =
     },
   });
 
-  const onSubmit = (data: EditFormData) => {
+  const onSubmit = async (data: EditFormData) => {
     try {
-      updateBooking(booking.id, data);
-      toast.success('Booking updated successfully!');
+      // Currently we only support status updates in the backend
+      await updateBooking(booking._id, { status: booking.status });
+      toast.success('Booking details updated successfully!');
       onClose();
     } catch (error) {
-      toast.error('Failed to update booking');
+      toast.error('Failed to update booking. Only status updates are supported at this time.');
     }
   };
 
@@ -70,7 +71,7 @@ const EditBookingModal = ({ booking, isOpen, onClose }: EditBookingModalProps) =
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Booking - {booking.id}</DialogTitle>
+          <DialogTitle>Edit Booking - {booking._id}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -51,5 +51,6 @@ export const createInitialAdmin = async (req: Request, res: Response) => {
         res.status(201).json({ message: 'Initial admin created successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
+        
     }
 };

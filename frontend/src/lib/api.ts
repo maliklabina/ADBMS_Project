@@ -1,6 +1,17 @@
 const API_URL = 'http://localhost:5000/api';
 
 export interface LoginCredentials {
+    email?: string;
+    username?: string;
+    password: string;
+}
+
+export interface AdminLoginCredentials {
+    username: string;
+    password: string;
+}
+
+export interface UserLoginCredentials {
     email: string;
     password: string;
 }
@@ -62,6 +73,8 @@ class ApiService {
 
     private async fetchApi(endpoint: string, options: RequestInit = {}) {
         const token = this.getToken();
+        console.log('API Call:', { endpoint, method: options.method || 'GET', hasToken: !!token });
+        
         if (token) {
             options.headers = {
                 ...options.headers,
@@ -69,24 +82,32 @@ class ApiService {
             };
         }
 
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
-        });
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers,
+                },
+            });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Something went wrong');
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('API Error:', { endpoint, status: response.status, error });
+                throw new Error(error.message || 'Something went wrong');
+            }
+
+            const data = await response.json();
+            console.log('API Response:', { endpoint, status: response.status, dataLength: Array.isArray(data) ? data.length : 'object' });
+            return data;
+        } catch (error) {
+            console.error('API Exception:', { endpoint, error });
+            throw error;
         }
-
-        return response.json();
     }
 
     // Auth APIs
-    async adminLogin(credentials: LoginCredentials): Promise<AuthResponse> {
+    async adminLogin(credentials: AdminLoginCredentials): Promise<AuthResponse> {
         const response = await this.fetchApi('/admin/login', {
             method: 'POST',
             body: JSON.stringify(credentials),
